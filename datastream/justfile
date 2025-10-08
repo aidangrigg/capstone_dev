@@ -1,0 +1,13 @@
+init:
+  mkdir build
+  cd build && cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=YES ..
+
+build:
+  cmake --build build
+  # ninja
+
+run: build
+  ./build/unicorn_datastream
+
+clean-all:
+  rm -rf build

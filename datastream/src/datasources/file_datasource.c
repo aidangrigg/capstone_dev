@@ -1,0 +1,49 @@
+#include "file_datasource.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+int read_from_file(void *ctx) {
+  FileContext *context = (FileContext *)ctx;
+  const size_t ret_code = fread(context->buffer, sizeof(float), context->buffer_len, context->fptr);
+
+  if (ret_code == context->buffer_len) {
+    return 0;
+  } else if (feof(context->fptr)) {
+    printf("End of file reached.\n");
+    return -1;
+  } else {
+    printf("An error has occured!\n");
+    return 1;
+  }
+}
+
+void close_file(void *ctx) {
+  FileContext *context = (FileContext *)ctx;
+  fclose(context->fptr);
+  free(context->buffer);
+  free(context);
+}
+
+// TODO: Handle errors
+int create_file_source(DataSource *source, char *filename) {
+  FILE *fptr = fopen(filename, "rb");
+  size_t buff_len;
+  if (fread(&buff_len, sizeof(size_t), 1, fptr) != 1) {
+    printf("An error occured when trying to read the channel count. Binary "
+           "file is malformed.\n");
+    return 1;
+  }
+
+  float *buffer = malloc(sizeof(float) * buff_len);
+  FileContext *ctx = malloc(sizeof(FileContext));
+  ctx->fptr = fptr;
+  ctx->buffer = buffer;
+  ctx->buffer_len = buff_len;
+
+  source->context = ctx;
+  source->buffer = buffer;
+  source->buffer_len = buff_len;
+  source->next = read_from_file;
+  source->close = close_file;
+  return 0;
+}
