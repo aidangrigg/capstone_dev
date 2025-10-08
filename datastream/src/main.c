@@ -6,6 +6,18 @@
 #include "datasources/file_datasource.h"
 #include "datasources/unicorn_datasource.h"
 
+const char *HELP_STRING = "Usage: unicorn_datastream [options]\n"
+                          "Options:\n"
+                          "  --help                   Display this information.\n"
+                          "  -i, --input <FILE>       Read data from an input file rather than live\n"
+                          "                           recording.\n"
+                          "  -o, --output <FILE>      If live recording, will save this data to a\n"
+                          "                           a binary file. This binary file can be read using\n"
+                          "                           `--input`.\n"
+                          "  -d, --device <DEVICE_ID> Selects the accompanying unicorn headset.\n"
+                          "  -t, --test_signal        If set, will output a square waveform test signal\n"
+                          "                           rather than a live measurement.\n";
+
 typedef struct Options {
   char *input;
   char *output;
@@ -21,25 +33,25 @@ const Options DEFAULT_OPTIONS = {
 };
 
 static char short_options[] = "hti:o:d:";
-static struct option long_options[] = {{"input", required_argument, NULL, 'i'},
-                                       {"output", required_argument, NULL, 'o'},
-                                       {"device", required_argument, NULL, 'd'},
-                                       {"test_signal", no_argument, NULL, 't'},
-                                       {"help", no_argument, NULL, 'h'},
-                                       {NULL, 0, NULL, 0}};
+static struct option long_options[] = {
+    {"input", required_argument, NULL, 'i'},  //
+    {"output", required_argument, NULL, 'o'}, //
+    {"device", required_argument, NULL, 'd'}, //
+    {"test_signal", no_argument, NULL, 't'},  //
+    {"help", no_argument, NULL, 'h'},         //
+    {NULL, 0, NULL, 0},                       //
+};
 
 int main(int argc, char *argv[]) {
   char ch;
   Options opt = DEFAULT_OPTIONS;
-  while ((ch = getopt_long(argc, argv, short_options, long_options, NULL)) !=
-         -1) {
+  while ((ch = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
     switch (ch) {
     case 't':
       opt.test_signal = true;
       break;
     case 'h':
-      // TODO: proper help message
-      printf("I'm helping!\n");
+      printf("%s", HELP_STRING);
       return 0;
     case 'i':
       opt.input = optarg;
@@ -60,8 +72,7 @@ int main(int argc, char *argv[]) {
       return 1;
     }
   } else {
-    if (create_unicorn_source(source, opt.device, opt.test_signal,
-                              opt.output) != 0) {
+    if (create_unicorn_source(source, opt.device, opt.test_signal, opt.output) != 0) {
       return 1;
     }
   }
