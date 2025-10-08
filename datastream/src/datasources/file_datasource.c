@@ -27,6 +27,12 @@ void close_file(void *ctx) {
 // TODO: Handle errors
 int create_file_source(DataSource *source, char *filename) {
   FILE *fptr = fopen(filename, "rb");
+
+  if (fptr == NULL) {
+    printf("Could not open file \"%s\"\n", filename);
+    return 1;
+  }
+
   size_t buff_len;
   if (fread(&buff_len, sizeof(size_t), 1, fptr) != 1) {
     printf("An error occured when trying to read the channel count. Binary "
