@@ -1,18 +1,24 @@
 #include "file_datasource.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int read_from_file(void *ctx) {
   FileContext *context = (FileContext *)ctx;
+
+  usleep(100); // TODO: send data at specific frequency
+
   const size_t ret_code = fread(context->buffer, sizeof(float), context->buffer_len, context->fptr);
 
   if (ret_code == context->buffer_len) {
     return 0;
   } else if (feof(context->fptr)) {
-    printf("End of file reached.\n");
-    return -1;
+    printf("Seeking to begining of file\n");
+    fseek(context->fptr, sizeof(size_t), SEEK_SET);
+    return 0;
   } else {
-    printf("An error has occured!\n");
+    printf("An error has occured! %zu bytes read from file when %zu should have been.\n", ret_code,
+           context->buffer_len);
     return 1;
   }
 }

@@ -13,12 +13,12 @@
           packages = with pkgs; [
             cmake
             ninja
-
             gcc
             bluez
             bluez.dev
             just
             clang-tools
+            liblsl
           ];
           buildInputs = [
           ];

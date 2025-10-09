@@ -15,4 +15,5 @@ target_link_libraries(unicorn_datastream
     ${CMAKE_SOURCE_DIR}/lib/libunicorn.so
     stdc++ # needed by libunicorn
     bluetooth
+    lsl
 )

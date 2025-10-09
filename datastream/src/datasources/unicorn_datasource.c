@@ -11,8 +11,7 @@ int read_from_unicorn(void *ctx) {
   UnicornContext *context = (UnicornContext *)ctx;
   int error_code = 0;
   printf("Beginning read...\n");
-  error_code = UNICORN_GetData(context->handle, 1, context->buffer,
-                               context->buffer_len * sizeof(float));
+  error_code = UNICORN_GetData(context->handle, 1, context->buffer, context->buffer_len * sizeof(float));
   if (error_code != 0) {
     log_unicorn_error(error_code);
     return error_code;
@@ -53,13 +52,11 @@ void close_unicorn(void *ctx) {
   free(context);
 }
 
-int create_unicorn_source(DataSource *source, int device_selection,
-                          bool test_signal, char *filename) {
+int create_unicorn_source(DataSource *source, int device_selection, bool test_signal, char *filename) {
   int error_code = 0;
   unsigned int available_devices_count = 0;
   printf("Searching for available devices...\n");
-  error_code =
-      UNICORN_GetAvailableDevices(NULL, &available_devices_count, TRUE);
+  error_code = UNICORN_GetAvailableDevices(NULL, &available_devices_count, TRUE);
   if (error_code != 0) {
     log_unicorn_error(error_code);
     return error_code;
@@ -72,10 +69,8 @@ int create_unicorn_source(DataSource *source, int device_selection,
     printf("%d devices found!\n", available_devices_count);
   }
 
-  UNICORN_DEVICE_SERIAL *available_devices =
-      malloc(sizeof(UNICORN_DEVICE_SERIAL) * available_devices_count);
-  error_code = UNICORN_GetAvailableDevices(available_devices,
-                                           &available_devices_count, true);
+  UNICORN_DEVICE_SERIAL *available_devices = malloc(sizeof(UNICORN_DEVICE_SERIAL) * available_devices_count);
+  error_code = UNICORN_GetAvailableDevices(available_devices, &available_devices_count, true);
   if (error_code != 0) {
     log_unicorn_error(error_code);
     return error_code;
@@ -123,7 +118,7 @@ int create_unicorn_source(DataSource *source, int device_selection,
   if (strcmp(filename, "") != 0) {
     FILE *fptr = fopen(filename, "wb");
     ctx->fptr = fptr;
-    fwrite(&acquisition_buffer_length, sizeof(size_t), 1, fptr); // write the buffer length to the start of the binary file
+    fwrite(&acquisition_buffer_length, sizeof(int), 1, fptr); // write the buffer length to the start of the binary file
   }
 
   source->context = ctx;
@@ -144,8 +139,7 @@ void log_unicorn_error(int error_code) {
     printf("The initialization of the Bluetooth adapter failed.\n");
     break;
   case UNICORN_ERROR_BLUETOOTH_SOCKET_FAILED:
-    printf("The operation could not be performed because the Bluetooth socket "
-           "failed.\n");
+    printf("The operation could not be performed because the Bluetooth socket failed.\n");
     break;
   case UNICORN_ERROR_OPEN_DEVICE_FAILED:
     printf("The device could not be opened.\n");
