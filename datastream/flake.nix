@@ -19,6 +19,7 @@
             just
             clang-tools
             liblsl
+            gdb
           ];
           buildInputs = [
           ];

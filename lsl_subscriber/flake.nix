@@ -16,20 +16,28 @@
             export LD_LIBRARY_PATH=${pkgs.liblsl}/lib:$LD_LIBRARY_PATH
           '';
 
-          packages = with pkgs; [
-            python312.pkgs.venvShellHook
-            python312.pkgs.pip
+          packages = let
+            pyPkgs = pkgs.python312.pkgs;
+          in
+            with pkgs; [
+              pyPkgs.pip
+              pyPkgs.python-lsp-server
 
-            liblsl
-            # Add whatever else you'd like here.
-            # pkgs.basedpyright
+              pyPkgs.pylsl
+              pyPkgs.matplotlib
+              pyPkgs.numpy
+              pyPkgs.mne
 
-            # pkgs.black or python.pkgs.black
+              liblsl
+              # Add whatever else you'd like here.
+              # pkgs.basedpyright
 
-            # pkgs.ruff
-            # or
-            # python.pkgs.ruff
-          ];
+              # pkgs.black or python.pkgs.black
+
+              # pkgs.ruff
+              # or
+              # python.pkgs.ruff
+            ];
         };
       }
     );

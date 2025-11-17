@@ -3,6 +3,8 @@ project(unicorn_datastream C CXX)
 
 add_compile_options(-Wall -Wextra)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 add_executable(unicorn_datastream
         src/main.c
         src/datasources/unicorn_datasource.c
