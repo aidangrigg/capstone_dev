@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/25.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -18,19 +18,6 @@
 
           packages = let
             pythonPackages = pkgs.python312.pkgs;
-            # mne-lsl =
-            #   let
-            #     pname = "mne-lsl";
-            #     version = "1.11.0";
-            #   in
-            #     pythonPackages.buildPythonPackage {
-            #       inherit pname version;
-            #       src = pkgs.fetchPypi {
-            #         inherit pname version;
-            #         # sha256 = "sha256-ikAz9jGqoVEpob6MFNw6lj1/BL7Zev9kYJIBw5w0nN0=";
-            #       };
-            #       doCheck = false;
-            #     };
           in
             with pythonPackages; [
               pip
@@ -38,13 +25,22 @@
               matplotlib
               numpy
               mne
+              scipy
+              scipy-stubs
+              pylsl
+              pyqtgraph
+              pyqt6
+              pyside6
+
+              pkgs.qt6.qtbase
 
               # mne-lsl
-              pkgs.basedpyright
+              # pkgs.basedpyright
+              pkgs.ty
               pkgs.liblsl
               # Add whatever else you'd like here.
 
-              # pkgs.black or python.pkgs.black
+              black
 
               # pkgs.ruff
               # or
