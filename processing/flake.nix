@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/25.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -17,22 +17,30 @@
           '';
 
           packages = let
-            pyPkgs = pkgs.python312.pkgs;
+            pythonPackages = pkgs.python312.pkgs;
           in
-            with pkgs; [
-              pyPkgs.pip
-              pyPkgs.python-lsp-server
+            with pythonPackages; [
+              pip
 
-              pyPkgs.pylsl
-              pyPkgs.matplotlib
-              pyPkgs.numpy
-              pyPkgs.mne
+              matplotlib
+              numpy
+              mne
+              scipy
+              scipy-stubs
+              pylsl
+              pyqtgraph
+              pyqt6
+              pyside6
 
-              liblsl
-              # Add whatever else you'd like here.
+              pkgs.qt6.qtbase
+
+              # mne-lsl
               # pkgs.basedpyright
+              pkgs.ty
+              pkgs.liblsl
+              # Add whatever else you'd like here.
 
-              # pkgs.black or python.pkgs.black
+              black
 
               # pkgs.ruff
               # or

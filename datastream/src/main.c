@@ -109,19 +109,26 @@ int main(int argc, char *argv[]) {
 
   printf("Now sending data...\n");
 
+  /* while(true) { */
+    if(!lsl_have_consumers(outlet)) {
+      do
+        printf("Waiting for consumers\n");
+      while (!lsl_wait_for_consumers(outlet, 120));
+    }
+
+
   /* send data until the last consumer has disconnected */
   for (int t = 0; lsl_have_consumers(outlet); t++) {
     if (source->next(source->context) != 0) {
-      break;
+      /* break; */
     }
 
     lsl_push_sample_f(outlet, source->buffer);
-    /* for (int n = 0; n < 100 && source->next(source->context) == 0; n++) { */
-    /*   for (size_t i = 0; i < source->buffer_len; i++) { */
-    /*     printf("%f,", source->buffer[i]); */
-    /*   } */
-    /*   printf("\n"); */
-    /* } */
+    for (size_t i = 0; i < source->buffer_len; i++) {
+      printf("%f,", source->buffer[i]);
+    }
+    printf("\n");
+
     /* float cursample[8]; /\* the current sample *\/ */
     /* cursample[0] = (float)t; */
     /* for (int c = 1; c < 8; c++) */
