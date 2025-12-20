@@ -1,18 +1,49 @@
-## Howto Compile
+# Datastream
 
-### Compile the example
+NOTE: This software is built specifically for Linux. If using Windows, try the "Unicorn LSL" software that can be used through the [Unicorn Suite](https://www.gtec.at/product/unicorn-suite/).
 
-`g++ main.cpp -I ../Lib -L ../Lib -lunicorn -o UnicornAcquisitionExample`
+(TODO: proper description)
 
-or if you run into problems try:
+## Building
 
-`g++ main.cpp -Wno-narrowing -I ../Lib -L ../Lib -lunicorn -o UnicornAcquisitionExample`
+### Dependencies
 
-### Add Unicorn C-Lib to LD_LIBRARY PATH
-Put this into you .bashrc and replace PATHTOLIBFOLDER with the absolute path to the `../Lib` relative to this directory.
-e.g. /home/youruser/Desktop/Unicorn\ Linux\ C\ API\x64\Lib
+#### Nix
 
-`export LD_LIBRARY_PATH=PATHTOLIBFOLDER:$LD_LIBRARY_PATH`
+(TODO: write proper nix build script)
+Run `nix develop` in this directory
 
-### Execute the Example
-`./UnicornAcquisitionExample`
+#### Other distros
+
+(TODO: list required deps)
+
+### Instructions
+
+`cd` into the `datastream/` directory and run the following commands.
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+
+After running these commands (and assuming all the required dependencies are installed), an `unicorn_datastream` executable should be compiled. To check that everything is working correctly, try running `./unicorn-datastream --help`.
+
+## Running
+
+```
+Usage: unicorn_datastream [options]
+Options:
+  --help                   Display this information.
+  -i, --input <FILE>       Read data from an input file rather than live
+                           recording.
+  -o, --output <FILE>      If live recording, will save this data to a
+                           a binary file. This binary file can be read using
+                           `--input`.
+  -d, --device <DEVICE_ID> Selects the accompanying unicorn headset.
+  -t, --test_signal        If set, will output a square waveform test signal
+                           rather than a live measurement.
+```
+
+Example command: `./build/unicorn_datastream -i ./example_data/2025-11-18_1.out`
