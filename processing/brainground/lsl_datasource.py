@@ -62,7 +62,7 @@ class LSLDataSource():
         if bandpass is not None:
             nyq = 0.5 * self.sampling_rate
             # TODO: configuring butterworth order
-            sos_butter_filter = sp.butter(6, [bandpass[0] / nyq, bandpass[1] / nyq], btype='band', output='sos')
+            sos_butter_filter = sp.butter(4, [bandpass[0] / nyq, bandpass[1] / nyq], btype='band', output='sos')
             if self._butter_zi is None:
                 self._butter_zi = [sp.sosfilt_zi(sos_butter_filter) * [0] for ch in range(self.channel_count)]
 
@@ -87,7 +87,7 @@ class LSLDataSource():
         return samples_read
 
     def welch(self, channel: int = 0) -> tuple[np.ndarray, np.ndarray]:
-        return sp.welch(self.buf[:, channel], self._info.nominal_srate(), axis=0)
+        return sp.welch(self.buf[:, channel], self._info.nominal_srate(), axis=0, nperseg=(2.5 * self.sampling_rate))
 
 if __name__ == "__main__":
     datasource = LSLDataSource()
