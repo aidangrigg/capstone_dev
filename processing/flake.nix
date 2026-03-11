@@ -37,6 +37,7 @@
               # mne-lsl
               # pkgs.basedpyright
               pkgs.ty
+              pkgs.pyright
               pkgs.liblsl
               # Add whatever else you'd like here.
 
