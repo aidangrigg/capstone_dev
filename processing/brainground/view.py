@@ -8,13 +8,12 @@ from ui.freq_band_checkbox import FrequencyBand
 
 AMPLITUDE_LIMIT = 100
 
-class UIEvent():
-    pass
-
 class MainView(QMainWindow):
-    ui_event = Signal(UIEvent)
+    active_bands_set = Signal(list)
+    active_channels_set = Signal(list)
+    compute_new_average = Signal()
 
-    def __init__(self, channel_count: int, time_window: int, sampling_rate: int):
+    def __init__(self, channel_count: int, time_window: int, sampling_rate: float):
         super().__init__()
 
         self.channel_count = channel_count
@@ -28,11 +27,12 @@ class MainView(QMainWindow):
 
         # Voltage plot (leftmost, plots mV/t)
         voltage_widget: PlotWidget = PlotWidget()
-        self.voltage_plot: PlotItem = voltage_widget.getPlotItem()
+        self.voltage_plot: PlotItem = voltage_widget.getPlotItem() # type: ignore
         self.voltage_plot.showGrid(x=True, y=True, alpha=0.3)
-        self.voltage_plot.getViewBox().setMouseEnabled(x=False, y=False)
         self.voltage_plot.setLabels(left="Channels", bottom="Time (s)")
-        self.voltage_plot.setYRange(0, channel_count)
+        self.voltage_plot.getViewBox().setMouseEnabled(x=False, y=False) # type: ignore
+        self.voltage_plot.setYRange(0, channel_count) # type: ignore
+        self.voltage_plot.setXRange(0, self.time_window) # type: ignore
         self.voltage_plot.getAxis("left").setTicks(
             [
                 [
@@ -41,7 +41,6 @@ class MainView(QMainWindow):
                 ]
             ]
         )
-        self.voltage_plot.setXRange(0, self.time_window)
         layout.addWidget(voltage_widget)
 
         middle_plot = QWidget()
@@ -50,11 +49,11 @@ class MainView(QMainWindow):
 
         # PSD plot (center, plots (V^2/Hz))
         psd_widget = PlotWidget()
-        self.psd_plot = psd_widget.getPlotItem()
+        self.psd_plot: PlotItem = psd_widget.getPlotItem() # type: ignore
         self.psd_plot.showGrid(x=True, y=True, alpha=0.3)
-        self.psd_plot.getViewBox().setMouseEnabled(x=False, y=False)
         self.psd_plot.setLabels(left="Power spectral density (V^2 / Hz)", bottom="frequency (Hz)")
-        self.psd_plot.setLimits(xMin=1, xMax=40, yMin=0, yMax=500)
+        self.psd_plot.getViewBox().setMouseEnabled(x=False, y=False) # type: ignore
+        self.psd_plot.setLimits(xMin=1, xMax=40, yMin=0, yMax=500) # type: ignore
         psd_layout.addWidget(psd_widget)
 
         # power plot
@@ -75,7 +74,7 @@ class MainView(QMainWindow):
         for i in range(self.channel_count):
             # Each channel gets its own colored curve
             self.freq_domain_curves.append(
-                self.psd_plot.plot(
+                self.psd_plot.plot( # type: ignore
                     pen=self.colors[i], width=1
                 )
             )
@@ -104,6 +103,7 @@ class MainView(QMainWindow):
 
         for band in self.frequency_bands:
             controls_layout.addWidget(band)
+            band.stateChanged.connect(self.active_bands_changed)
 
         self.channels = [
             Channel(i + 1) for i in range(self.channel_count)
@@ -115,9 +115,10 @@ class MainView(QMainWindow):
 
         for channel in self.channels:
             controls_layout.addWidget(channel)
+            channel.stateChanged.connect(self.active_channels_changed)
 
         avg_button = QPushButton("Compute average... (takes 5s)")
-        # avg_button.clicked.connect(lambda _: self.get_average.emit())
+        avg_button.clicked.connect(self.on_avg_button_pressed)
         controls_layout.addWidget(avg_button)
 
         self.avg_label: QLabel = QLabel()
@@ -126,6 +127,16 @@ class MainView(QMainWindow):
         controls_layout.addStretch()
 
         self.t_vec = np.arange(self.time_window * self.sampling_rate) / self.sampling_rate
+
+    def on_avg_button_pressed(self):
+        self.compute_new_average.emit()
+        self.avg_label.setText("computing average...")
+
+    def active_bands_changed(self):
+        self.active_bands_set.emit(list(map(lambda x: x.isChecked(), self.frequency_bands)))
+
+    def active_channels_changed(self):
+        self.active_channels_set.emit(list(map(lambda x: x.isChecked(), self.channels)))
 
     def set_eeg_plot(self, data):
         t_disp = self.t_vec[:]
@@ -146,26 +157,5 @@ class MainView(QMainWindow):
                 curve.setData([], [])
 
     def set_bandpower_delta_plot(self, delta: float):
+        self.avg_label.setText(f"Value = {delta}")
         self.power_plot.setOpts(x=[0], height=[delta], brushes=('g' if delta > 0 else 'r'))
-
-        # plot_values, plot_ticks, plot_brushes = []
-        # for i, band in enumerate(self.frequency_bands):
-        #     if not band.isChecked():
-        #         continue
-
-        #     delta =  deltas[i]
-        #     plot_values.append(delta)
-        #     plot_ticks.append(band.name)
-        #     plot_brushes.append('g' if delta > 0 else 'r')
-
-        # if len(plot_values) > 0:
-        #     idxs = list(range(len(plot_values)))
-        #     self.power_plot.setOpts(x=idxs, height=plot_values, brushes=plot_brushes)
-
-        #     if len(self.power_plot_ticks) != len(plot_ticks):
-        #         ticks = list(zip(idxs, plot_ticks))
-        #         self.power_widget.getAxis("bottom").setTicks([ticks])
-        #         self.power_plot_ticks = plot_ticks
-
-
-

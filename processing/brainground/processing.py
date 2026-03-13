@@ -19,23 +19,50 @@ FREQUENCY_BANDS = [
     (30.0, 50.0), # Gamma
 ]
 
+AVG_TIME_WINDOW = 5
+
 class NeurofeedbackProcessing(QObject):
     metric_computed = Signal(float)
 
-    def __init__(self):
+    def __init__(self, channel_count: int, sampling_rate: float, window_length: float):
         super().__init__()
 
+        self.refresh_rate = 1000 / 20
+
+        self.channel_count = channel_count
+        self.sampling_rate = sampling_rate
+        self.window_length = window_length
+
+        self.band_average: float | None = None
+        self.computing_average = False
+        self.psd_readings: list[float] = []
+        self.psd_average_readings = (AVG_TIME_WINDOW * 1000) // self.refresh_rate
+
         self.type = Types.BANDPOWER
-        self.active_channels = [True, False, False, False, False, False, False, False]
-        self.active_bands = [True, False, False, False, False, False]
+        self.active_channels = [False for _ in range(channel_count)]
+        self.active_bands = [False for _ in range(len(FREQUENCY_BANDS))]
         self.timer = QTimer()
         self.timer.timeout.connect(self.run)
-        self.timer.start(int(1000 / 20))
+        self.timer.start(int(self.refresh_rate))
 
-        max_points = int(10 * 250)
-        self.channel_count = 8
+        max_points = int(self.window_length * self.sampling_rate)
         self.buffer = np.zeros((max_points, self.channel_count))
-        self.sampling_rate = 250
+
+        self.psd = [np.empty(1) for _ in range(self.channel_count)]
+        self.freqs = np.empty(1)
+
+    def compute_average_bandpower(self):
+        self.band_average = None
+        self.psd_readings = []
+        self.computing_average = True
+
+    def set_active_channels(self, channels):
+        self.band_average = None
+        self.active_channels = channels
+
+    def set_active_bands(self, band):
+        self.band_average = None
+        self.active_bands = band
 
     def update_buffer(self, buf: np.ndarray[Any, np.dtype[np.float64]]):
         self.buffer = buf
@@ -43,24 +70,36 @@ class NeurofeedbackProcessing(QObject):
     def run(self):
         match self.type:
             case Types.BANDPOWER:
-                self.metric_computed.emit(self.compute_bandpower_score())
+                if self.computing_average:
+                    self.compute_band_average()
+                elif self.band_average is not None:
+                    self.metric_computed.emit(self.compute_bandpower_score() - self.band_average)
             case Types.FAA:
                 pass
 
     def welch(self, channel: int = 0) -> tuple[np.ndarray, np.ndarray]:
         return sp.welch(self.buffer[:, channel], self.sampling_rate, axis=0, nperseg=int(2.5 * self.sampling_rate))
 
-    def compute_bandpower_score(self):
+    def compute_band_average(self):
+        p = self.compute_bandpower_score()
+        self.psd_readings.append(p)
+
+        if len(self.psd_readings) >= self.psd_average_readings:
+            self.computing_average = False
+            print(f"self.psd_readings = {self.psd_readings}")
+            self.band_average = float(np.mean(self.psd_readings))
+
+    def compute_bandpower_score(self) -> float:
         psd_values = [[] for _ in range(self.channel_count)]
         for ch in range(self.channel_count):
-            freqs, psd = self.welch(ch)
-            freq_res = freqs[1] - freqs[0]
+            self.freqs, self.psd[ch] = self.welch(ch)
+            freq_res = self.freqs[1] - self.freqs[0]
 
             for i, band in enumerate(FREQUENCY_BANDS):
                 if not self.active_bands[i]:
                     continue
-                idxs = np.logical_and(freqs >= band[0], freqs <= band[1])
-                bp = simpson(psd[idxs], dx=freq_res)
+                idxs = np.logical_and(self.freqs >= band[0], self.freqs <= band[1])
+                bp = simpson(self.psd[ch][idxs], dx=freq_res)
                 psd_values[ch].append(bp)
 
         psd_values = np.array(psd_values).transpose() # [:band [:channel]]
@@ -74,7 +113,7 @@ class NeurofeedbackProcessing(QObject):
 
             arr.append(np.mean(power_in_band))
 
-        return np.mean(arr)
+        return float(np.mean(arr))
 
     def compute_faa_score(self):
         raise NotImplemented
