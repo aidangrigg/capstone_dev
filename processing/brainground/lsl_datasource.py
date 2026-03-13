@@ -23,7 +23,6 @@ class LSLDataSource(QObject):
         self.timer.timeout.connect(self.run)
         self.timer.start(int(1000 / 100))
 
-
     def get_streams(self) -> list[lsl.StreamInfo]:
         return lsl.resolve_byprop("type", "EEG")
 
