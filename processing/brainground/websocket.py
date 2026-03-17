@@ -14,12 +14,10 @@ class NeurofeedbackWebsocketServer(QObject):
         self.server = QWebSocketServer(WS_SERVER_NAME, QWebSocketServer.SslMode.NonSecureMode, self)
 
         if not self.server.listen(QHostAddress.SpecialAddress.LocalHost, 1234):
-            print("FAILED TO CREATE SERVER")
             return
         self.server.newConnection.connect(self.on_new_connection)
 
     def on_new_connection(self):
-        print("new connection")
         socket = self.server.nextPendingConnection()
         if socket is not None and socket.isValid():
             self.sockets.append(socket)
@@ -33,7 +31,6 @@ class NeurofeedbackWebsocketServer(QObject):
 
         packet = json.toJson(QJsonDocument.JsonFormat.Compact).toStdString()
 
-        print(f"number of sockets: {len(self.sockets)}")
         for socket in self.sockets:
             socket.sendTextMessage(packet)
 

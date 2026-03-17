@@ -1,5 +1,6 @@
 from PySide6.QtCore import QObject, QTimer
 
+from websocket import NeurofeedbackWebsocketServer
 from processing import NeurofeedbackProcessing
 from view import MainView
 
@@ -16,7 +17,11 @@ class Presenter(QObject):
         self.timer.timeout.connect(self.run)
         self.timer.start(int(self.refresh_rate))
 
+        self.ws = NeurofeedbackWebsocketServer()
+
         self.processing.metric_computed.connect(self.view.set_bandpower_delta_plot)
+        self.processing.metric_computed.connect(self.ws.send_packet)
+
         self.view.active_bands_set.connect(self.processing.set_active_bands)
         self.view.active_channels_set.connect(self.processing.set_active_channels)
         self.view.compute_new_average.connect(self.processing.compute_average_bandpower)
