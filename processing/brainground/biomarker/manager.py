@@ -73,7 +73,6 @@ class BiomarkerManager(QObject):
         entity.widget = widget
 
         self.biomarkers.append(entity)
-
         self.view.add_biomarker_widget(entity.widget)
 
 
