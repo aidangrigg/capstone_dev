@@ -15,7 +15,7 @@ class BaseBiomarkerWidget(ABC):
         self.header_bar = QWidget()
         self.header_layout = QHBoxLayout(self.header_bar)
 
-        self.title_text = QLabel("Bandpower Widget")
+        self.title_text = QLabel(self.node.iden.name())
 
         settings_button = QPushButton("Settings")
         settings_button.clicked.connect(self.create_settings_dialog)
@@ -26,11 +26,11 @@ class BaseBiomarkerWidget(ABC):
         self.layout.addWidget(self.header_bar)
         self.plot = None
 
-    def settings_button_pressed(self):
-        pass
-
     def id(self):
-        return self.node.id
+        return self.node.iden.id()
+
+    def set_name(self, name: str):
+        self.title_text.setText(name)
 
     @abstractmethod
     def create_settings_dialog(self):

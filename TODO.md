@@ -1,3 +1,12 @@
+WORKING ON: Add and remove modal
+
+Currently,
+- [x] Add and remove modal
+- [x] Connect sidebar state and main application state
+- [x] Connect multiple biomarkers to websocket
+- [ ] Show name field in biomarker view
+- [ ] Test EEG
+
 # Todo
 - [x] Refactoring nf processing proj.
 - [x] Websocket (nf processing -> unity proj.)

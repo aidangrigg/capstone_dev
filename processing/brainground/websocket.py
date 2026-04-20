@@ -22,17 +22,20 @@ class NeurofeedbackWebsocketServer(QObject):
         if socket is not None and socket.isValid():
             self.sockets.append(socket)
 
-    def send_packet(self, delta: float):
+    def send_packet(self, packet: dict):
         self.sockets = list(filter(lambda s: s.isValid(), self.sockets))
 
-        json = QJsonDocument({
-            "delta": QJsonValue(delta)
-        })
+        json_doc: dict[str, QJsonValue] = {}
 
-        packet = json.toJson(QJsonDocument.JsonFormat.Compact).toStdString()
+        for key, value in packet.items():
+            json_doc[key] = QJsonValue(value)
+
+        json = QJsonDocument(json_doc)
+
+        str_packet = json.toJson(QJsonDocument.JsonFormat.Compact).toStdString()
 
         for socket in self.sockets:
-            socket.sendTextMessage(packet)
+            socket.sendTextMessage(str_packet)
 
 if __name__ == "__main__":
     import sys
@@ -42,7 +45,7 @@ if __name__ == "__main__":
     ws = NeurofeedbackWebsocketServer()
 
     timer = QTimer()
-    timer.timeout.connect(lambda: ws.send_packet(10))
+    timer.timeout.connect(lambda: ws.send_packet({"alpha": 10}))
     timer.start(1000)
 
     sys.exit(app.exec())

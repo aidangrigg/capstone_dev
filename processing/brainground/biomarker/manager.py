@@ -1,21 +1,15 @@
-from enum import Enum
-
 from PySide6.QtCore import QObject, QTimer
 import numpy as np
 from scipy.signal import welch
 
 from biomarker.bandpower import BandpowerBiomarker
 from biomarker.base import Biomarker
-from biomarker.types import FFT
+from biomarker.types import FFT, BiomarkerTypes
+from websocket import NeurofeedbackWebsocketServer
 from lsl_datasource import LSLDataSource
 from ui.biomarker.bandpower_widget import BandpowerWidget
 from ui.biomarker.base_widget import BaseBiomarkerWidget
 from ui.main_view import MainView2
-
-class BiomarkerTypes(Enum):
-    BANDPOWER = 1
-    FAA = 2
-
 
 class BiomarkerEntity:
     type: BiomarkerTypes
@@ -26,13 +20,18 @@ class BiomarkerManager(QObject):
     nextId = 1
     biomarkers: list[BiomarkerEntity] = []
 
-    def __init__(self, lsl_node: LSLDataSource, view: MainView2):
+    def __init__(self, lsl_node: LSLDataSource, view: MainView2, websocket: NeurofeedbackWebsocketServer):
         self.refresh_rate = int(1000 / 20)
         self.lsl_node = lsl_node
         self.fft = FFT()
         self.fft.psd = [np.empty(1)] * self.lsl_node.channel_count
 
         self.view = view
+
+        self.view.biomarker_added.connect(self.add_biomarker)
+        self.view.biomarker_deleted.connect(self.remove_biomarker)
+
+        self.ws = websocket
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_biomarkers)
@@ -48,19 +47,38 @@ class BiomarkerManager(QObject):
 
         self.fft.resolution = self.fft.freqs[1] - self.fft.freqs[0]
 
+    def send_websocket(self):
+        if not self.biomarkers:
+            return
+
+        packet = {}
+
+        for entity in self.biomarkers:
+            name = entity.node.iden.name()
+            delta = entity.node.score
+            packet[name] = delta
+
+        self.ws.send_packet(packet)
+
     def update_biomarkers(self):
         self.compute_fft()
+
+        self.view.set_eeg_plot(self.lsl_node.buf)
+        self.view.set_psd_plot(self.fft.freqs, self.fft.psd)
+
         for entity in self.biomarkers:
             entity.node.compute(self.lsl_node.buf, self.fft)
             entity.widget.update()
 
-    def add_biomarker(self, type: BiomarkerTypes):
+        self.send_websocket()
+
+    def add_biomarker(self, type: BiomarkerTypes, name: str):
         node = None
         widget = None
 
         match type:
             case BiomarkerTypes.BANDPOWER:
-                node = BandpowerBiomarker(self.nextId)
+                node = BandpowerBiomarker(self.nextId, name)
                 widget = BandpowerWidget(node)
             case BiomarkerTypes.FAA:
                  raise NotImplemented
@@ -74,15 +92,18 @@ class BiomarkerManager(QObject):
 
         self.biomarkers.append(entity)
         self.view.add_biomarker_widget(entity.widget)
-
+        self.view.add_biomarker_to_sidebar(entity.node.iden)
 
     def remove_biomarker(self, id: int):
+        print(f"yo id: {id}")
         found_idx = -1
 
         for i, entity in enumerate(self.biomarkers):
-            if entity.node.id == id:
+            if entity.node.iden.id() == id:
                 found_idx = i
                 break
 
         if found_idx != -1:
+            entity = self.biomarkers[found_idx]
+            self.view.remove_biomarker_widget(entity.widget)
             del self.biomarkers[found_idx]
