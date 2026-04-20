@@ -1,7 +1,10 @@
 import os
+
 os.environ["PYQTGRAPH_QT_LIB"] = "PySide6"
 
-from biomarker.manager import BiomarkerManager, BiomarkerTypes
+from websocket import NeurofeedbackWebsocketServer
+from biomarker.types import BiomarkerTypes
+from biomarker.manager import BiomarkerManager
 from ui.main_view import MainView2
 from presenter import Presenter
 from processing import NeurofeedbackProcessing
@@ -29,11 +32,13 @@ if __name__ == "__main__":
 
     view = MainView2()
     lsl_node = LSLDataSource()
-    manager = BiomarkerManager(lsl_node, view)
+    ws = NeurofeedbackWebsocketServer()
 
-    manager.add_biomarker(BiomarkerTypes.BANDPOWER)
-    manager.add_biomarker(BiomarkerTypes.BANDPOWER)
-    manager.add_biomarker(BiomarkerTypes.BANDPOWER)
+    manager = BiomarkerManager(lsl_node, view, ws)
+
+    # manager.add_biomarker(BiomarkerTypes.BANDPOWER)
+    # manager.add_biomarker(BiomarkerTypes.BANDPOWER)
+    # manager.add_biomarker(BiomarkerTypes.BANDPOWER)
 
     view.show()
     sys.exit(app.exec())

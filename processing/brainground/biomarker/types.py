@@ -1,4 +1,9 @@
+from enum import Enum
 import numpy as np
+
+class BiomarkerTypes(Enum):
+    BANDPOWER = 1
+    FAA = 2
 
 class FFT:
     freqs: np.ndarray

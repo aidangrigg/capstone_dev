@@ -6,7 +6,7 @@ from biomarker.types import FFT
 
 class BandpowerSettings():
     channels: list[int] = [0, 1]
-    band: tuple[int, int] = (7.0, 12.0)
+    band: tuple[float, float] = (7.0, 12.0)
     baseline: float = 100.0
 
 class BandpowerBiomarker(Biomarker):
@@ -14,8 +14,8 @@ class BandpowerBiomarker(Biomarker):
 
     score = 0.0
 
-    def __init__(self, id: int):
-        super().__init__(id)
+    def __init__(self, id: int, name: str):
+        super().__init__(id, name)
 
     def update_settings(self, new_settings: BandpowerSettings):
         self.settings = new_settings
