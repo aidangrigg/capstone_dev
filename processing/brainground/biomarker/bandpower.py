@@ -2,11 +2,11 @@
 import numpy as np
 from scipy.integrate import simpson
 from brainground.biomarker.base import Biomarker
-from brainground.biomarker.types import FFT
+from brainground.biomarker.types import FFT, FrequencyBands
 
 class BandpowerSettings():
     channels: list[int] = [0, 1]
-    band: tuple[float, float] = (7.0, 12.0)
+    band: FrequencyBands = FrequencyBands.ALPHA
     baseline: float = 100.0
 
 class BandpowerBiomarker(Biomarker):
@@ -21,7 +21,8 @@ class BandpowerBiomarker(Biomarker):
         self.settings = new_settings
 
     def compute(self, buffer: np.ndarray, fft: FFT):
-        idxs = np.logical_and(fft.freqs >= self.settings.band[0],  fft.freqs <= self.settings.band[1])
+        band_tuple = self.settings.band.value
+        idxs = np.logical_and(fft.freqs >= band_tuple[0],  fft.freqs <= band_tuple[1])
 
         bp_total = 0.0
         for channel in self.settings.channels:

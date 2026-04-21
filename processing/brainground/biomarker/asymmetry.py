@@ -3,12 +3,12 @@ import numpy as np
 from scipy.integrate import simpson
 
 from brainground.biomarker.base import Biomarker
-from brainground.biomarker.types import FFT
+from brainground.biomarker.types import FFT, FrequencyBands
 
 class AsymmetrySettings():
     left_channel: int = 0
     right_channel: int = 1
-    band: tuple[float, float] = (7.0, 12.0)
+    band: FrequencyBands = FrequencyBands.ALPHA
 
 class AsymmetryBiomarker(Biomarker):
     settings = AsymmetrySettings()
@@ -22,7 +22,8 @@ class AsymmetryBiomarker(Biomarker):
         self.settings = new_settings
 
     def compute(self, buffer: np.ndarray, fft: FFT):
-        idxs = np.logical_and(fft.freqs >= self.settings.band[0],  fft.freqs <= self.settings.band[1])
+        band_range = self.settings.band.value
+        idxs = np.logical_and(fft.freqs >= band_range[0],  fft.freqs <= band_range[1])
 
         left_bp = simpson(fft.psd[self.settings.left_channel][idxs], dx=fft.resolution)
         right_bp = simpson(fft.psd[self.settings.right_channel][idxs], dx=fft.resolution)
