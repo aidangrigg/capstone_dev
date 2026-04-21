@@ -3,7 +3,7 @@ from brainground.biomarker.asymmetry import AsymmetrySettings, AsymmetryBiomarke
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 
 import copy
-from PySide6.QtWidgets import QDialog, QFormLayout, QRadioButton, QGridLayout, QDialogButtonBox, QButtonGroup, QCheckBox
+from PySide6.QtWidgets import QDialog, QFormLayout, QRadioButton, QGridLayout, QDialogButtonBox, QButtonGroup
 from pyqtgraph import BarGraphItem, PlotWidget
 
 FREQUENCY_BANDS = {
@@ -113,10 +113,13 @@ class AsymmetryWidget(BaseBiomarkerWidget):
         plot_widget = PlotWidget()
         self.plot: BarGraphItem = BarGraphItem(x0=0, height=0.8, width=[], y=[])
         plot_widget.showGrid(x=True, y=True, alpha=0.3)
-        plot_widget.setLabels(left="FAA Score")
+        plot_widget.setLabels(bottom="FAA Score")
         plot_widget.setXRange(-100, 100)
         plot_widget.addItem(self.plot)
         self.layout.addWidget(plot_widget)
+
+        ax = plot_widget.getAxis("left")
+        ax.setTicks([[]])
 
     def update(self):
         delta = self.node.score
