@@ -2,8 +2,8 @@
 from PySide6.QtCore import QAbstractListModel, QModelIndex, QPersistentModelIndex, Qt, Signal
 from PySide6.QtWidgets import QComboBox, QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QListView, QMessageBox, QPushButton, QVBoxLayout, QWidget
 
-from biomarker.base import Biomarker, BiomarkerIdentifier
-from biomarker.types import BiomarkerTypes
+from brainground.biomarker.base import Biomarker, BiomarkerIdentifier
+from brainground.biomarker.types import BiomarkerTypes
 
 class BiomarkerListModel(QAbstractListModel):
     def __init__(self, parent=None):

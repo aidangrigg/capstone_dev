@@ -2,13 +2,12 @@ import os
 
 os.environ["PYQTGRAPH_QT_LIB"] = "PySide6"
 
-from websocket import NeurofeedbackWebsocketServer
-from biomarker.types import BiomarkerTypes
-from biomarker.manager import BiomarkerManager
-from ui.view import MainView
+from brainground.websocket import NeurofeedbackWebsocketServer
+from brainground.biomarker.manager import BiomarkerManager
+from brainground.ui.view import MainView
+from brainground.lsl_datasource import LSLDataSource
 
 from PySide6 import QtWidgets
-from lsl_datasource import LSLDataSource
 import sys
 
 TIME_WINDOW = 10

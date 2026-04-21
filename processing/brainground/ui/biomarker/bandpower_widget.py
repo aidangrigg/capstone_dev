@@ -1,10 +1,10 @@
 
+from brainground.biomarker.bandpower import BandpowerBiomarker, BandpowerSettings
+from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
+
 import copy
 from PySide6.QtWidgets import QDialog, QDoubleSpinBox, QFormLayout, QRadioButton, QGridLayout, QDialogButtonBox, QButtonGroup, QCheckBox
-
 from pyqtgraph import BarGraphItem, PlotWidget
-from biomarker.bandpower import BandpowerBiomarker, BandpowerSettings
-from ui.biomarker.base_widget import BaseBiomarkerWidget
 
 FREQUENCY_BANDS = {
     "Delta": (0.0, 3.0),
