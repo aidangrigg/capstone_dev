@@ -31,7 +31,7 @@ class MainView(QMainWindow):
         self.voltage_plot.setLabels(left="Channels", bottom="Time (s)")
         self.voltage_plot.getViewBox().setMouseEnabled(x=False, y=False) # type: ignore
         self.voltage_plot.setYRange(0, self.channel_count)
-        self.voltage_plot.setXRange(0, self.time_window)
+        self.voltage_plot.setXRange(-self.time_window, 0)
         self.voltage_plot.getAxis("left").setTicks(
             [
                 [
@@ -81,16 +81,15 @@ class MainView(QMainWindow):
 
         self.grid_idx = [0, 0]
 
-        self.t_vec = np.arange(self.time_window * self.sampling_rate) / self.sampling_rate
+        self.t_vec = np.arange(-self.time_window * self.sampling_rate, 0) / self.sampling_rate
 
         BraingroundApplication.instance().biomarker_deleted.connect(self.remove_biomarker_widget)
 
     def set_eeg_plot(self, data):
-        t_disp = self.t_vec[:]
         for ch, curve in enumerate(self.time_domain_curves):
             offset = self.channel_count - ch - 0.5
             curve.setData(
-                t_disp, data[:, ch] / AMPLITUDE_LIMIT / 2 + offset
+                self.t_vec, data[:, ch] / AMPLITUDE_LIMIT / 2 + offset
             )
 
     def set_psd_plot(self, freqs, psd):
