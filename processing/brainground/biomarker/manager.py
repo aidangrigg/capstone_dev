@@ -83,6 +83,8 @@ class BiomarkerManager(QObject):
                 node = BandpowerBiomarker(self.nextId, name)
                 widget = BandpowerWidget(node)
             case BiomarkerTypes.ASYMMETRY:
+                node = AsymmetryBiomarker(self.nextId, name)
+                widget = AsymmetryWidget(node)
 
         self.nextId += 1
 
