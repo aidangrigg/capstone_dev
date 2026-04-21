@@ -1,6 +1,6 @@
 
 from brainground.biomarker.bandpower import BandpowerBiomarker, BandpowerSettings
-from brainground.biomarker.types import FrequencyBands
+from brainground.biomarker.types import FrequencyBand
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 
 import copy
@@ -46,7 +46,7 @@ class BandpowerSettingsDialog(QDialog):
 
         self.freq_button_group = QButtonGroup()
         freq_button_layout = GridLayout(2)
-        for band in FrequencyBands:
+        for band in FrequencyBand:
             radio_button = QRadioButton(band.name.capitalize())
             radio_button.clicked.connect(self.freq_button_pressed)
 
@@ -80,7 +80,7 @@ class BandpowerSettingsDialog(QDialog):
         self.settings.baseline = val
 
     def freq_button_pressed(self):
-        for band in FrequencyBands:
+        for band in FrequencyBand:
             if band.name.lower() == self.freq_button_group.checkedButton().text().lower():
                 self.settings.band = band
                 return

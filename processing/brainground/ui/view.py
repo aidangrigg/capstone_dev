@@ -1,9 +1,8 @@
-from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QGridLayout, QHBoxLayout, QMainWindow, QVBoxLayout, QWidget
 import numpy as np
 from pyqtgraph import PlotWidget
 
-from brainground.biomarker.types import BiomarkerTypes
+from brainground.application import BraingroundApplication
 from brainground.biomarker.base import BiomarkerIdentifier
 from brainground.ui.sidebar import Sidebar
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
@@ -11,9 +10,6 @@ from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 AMPLITUDE_LIMIT = 100
 
 class MainView(QMainWindow):
-    biomarker_added = Signal(BiomarkerTypes, str)
-    biomarker_deleted = Signal(int)
-
     def __init__(self):
         super().__init__()
 
@@ -78,15 +74,16 @@ class MainView(QMainWindow):
         self.biomarkers_layout = QGridLayout(self.biomarkers_widget)
         layout.addWidget(self.biomarkers_widget, 45)
 
+        self.biomarker_plots = {}
+
         self.sidebar = Sidebar()
-        self.sidebar.biomarker_added.connect(self.biomarker_added)
-        self.sidebar.biomarker_deleted.connect(self.biomarker_deleted)
         layout.addWidget(self.sidebar, 10)
 
         self.grid_idx = [0, 0]
 
         self.t_vec = np.arange(self.time_window * self.sampling_rate) / self.sampling_rate
 
+        BraingroundApplication.instance().biomarker_deleted.connect(self.remove_biomarker_widget)
 
     def set_eeg_plot(self, data):
         t_disp = self.t_vec[:]
@@ -100,16 +97,20 @@ class MainView(QMainWindow):
         for ch, curve in enumerate(self.freq_domain_curves):
             curve.setData(freqs, psd[ch])
 
-    def add_biomarker_to_sidebar(self, iden: BiomarkerIdentifier):
-        self.sidebar.add_biomarker(iden)
+    def remove_biomarker_widget(self, id: int):
+        if id not in self.biomarker_plots:
+            return
 
-    def remove_biomarker_widget(self, widget: BaseBiomarkerWidget):
+        widget = self.biomarker_plots[id]
+
         self.biomarkers_layout.removeWidget(widget.base_widget)
         widget.base_widget.setParent(None)
         self.biomarkers_layout.invalidate()
         self.biomarkers_layout.activate()
 
     def add_biomarker_widget(self, widget: BaseBiomarkerWidget):
+        self.biomarker_plots[widget.id()] = widget
+
         self.biomarkers_layout.addWidget(widget.base_widget, self.grid_idx[0], self.grid_idx[1])
         self.grid_idx[1] += 1
 

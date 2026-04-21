@@ -2,11 +2,11 @@
 import numpy as np
 from scipy.integrate import simpson
 from brainground.biomarker.base import Biomarker
-from brainground.biomarker.types import FFT, FrequencyBands
+from brainground.biomarker.types import FFT, BiomarkerType, FrequencyBand
 
 class BandpowerSettings():
     channels: list[int] = [0, 1]
-    band: FrequencyBands = FrequencyBands.ALPHA
+    band: FrequencyBand = FrequencyBand.ALPHA
     baseline: float = 100.0
 
 class BandpowerBiomarker(Biomarker):
@@ -14,8 +14,8 @@ class BandpowerBiomarker(Biomarker):
 
     score = 0.0
 
-    def __init__(self, id: int, name: str):
-        super().__init__(id, name)
+    def __init__(self, id: int, name: str, type: BiomarkerType):
+        super().__init__(id, name, type)
 
     def update_settings(self, new_settings: BandpowerSettings):
         self.settings = new_settings

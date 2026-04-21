@@ -1,9 +1,10 @@
 
-from PySide6.QtCore import QAbstractListModel, QModelIndex, QPersistentModelIndex, Qt, Signal
+from PySide6.QtCore import QAbstractListModel, QModelIndex, QPersistentModelIndex, Qt
 from PySide6.QtWidgets import QComboBox, QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QListView, QMessageBox, QPushButton, QVBoxLayout, QWidget
 
-from brainground.biomarker.base import Biomarker, BiomarkerIdentifier
-from brainground.biomarker.types import BiomarkerTypes
+from brainground.application import BraingroundApplication
+from brainground.biomarker.base import BiomarkerIdentifier
+from brainground.biomarker.types import BiomarkerType
 
 class BiomarkerListModel(QAbstractListModel):
     def __init__(self, parent=None):
@@ -55,10 +56,10 @@ class AddDialog(QDialog):
 
         name_field.textChanged.connect(self.on_name_changed)
 
-        self.type = BiomarkerTypes.BANDPOWER
+        self.type = BiomarkerType.BANDPOWER
 
         type_field = QComboBox()
-        type_field.addItems([e.name.capitalize() for e in BiomarkerTypes])
+        type_field.addItems([e.name.capitalize() for e in BiomarkerType])
         type_field.setCurrentText(self.type.name.capitalize())
         type_field.currentTextChanged.connect(self.on_type_changed)
 
@@ -77,7 +78,7 @@ class AddDialog(QDialog):
         self.name = text
 
     def on_type_changed(self, text: str):
-        for t in BiomarkerTypes:
+        for t in BiomarkerType:
             if t.name.lower() == text.lower():
                 self.type = t
                 return
@@ -86,9 +87,6 @@ class AddDialog(QDialog):
 # Connect to signal of BiomarkerIdentifier
 
 class Sidebar(QWidget):
-    biomarker_added = Signal(BiomarkerTypes, str)
-    biomarker_deleted = Signal(int)
-
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -115,6 +113,10 @@ class Sidebar(QWidget):
 
         layout.addLayout(button_layout)
 
+        application = BraingroundApplication.instance()
+        application.biomarker_added.connect(self.add_biomarker)
+        application.biomarker_deleted.connect(self.remove_biomarker)
+
     def add_biomarker(self, iden: BiomarkerIdentifier):
         self.bm_model.add(iden)
 
@@ -131,7 +133,8 @@ class Sidebar(QWidget):
 
         if dialog.exec_():
             print(f"Sidebar add signal: {(dialog.type, dialog.name)}")
-            self.biomarker_added.emit(dialog.type, dialog.name)
+            BraingroundApplication.instance().request_biomarker_added.emit(dialog.type, dialog.name)
+            # self.biomarker_added.emit(dialog.type, dialog.name)
 
     def spawn_remove_dialog(self):
         idxs = self.bm_view.selectedIndexes()
@@ -148,5 +151,7 @@ class Sidebar(QWidget):
             )
 
             if button == QMessageBox.StandardButton.Discard:
-                self.biomarker_deleted.emit(iden.id())
-                self.remove_biomarker(iden.id())
+                BraingroundApplication.instance().request_biomarker_deleted.emit(iden.id())
+
+                # self.biomarker_deleted.emit(iden.id())
+                # self.remove_biomarker(iden.id())
