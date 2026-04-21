@@ -2,9 +2,10 @@ from PySide6.QtCore import QObject, QTimer
 import numpy as np
 from scipy.signal import welch
 
+from brainground.application import BraingroundApplication
 from brainground.biomarker.bandpower import BandpowerBiomarker
 from brainground.biomarker.base import Biomarker
-from brainground.biomarker.types import FFT, BiomarkerTypes
+from brainground.biomarker.types import FFT, BiomarkerType
 from brainground.biomarker.asymmetry import AsymmetryBiomarker
 from brainground.ui.biomarker.asymmetry_widget import AsymmetryWidget
 from brainground.websocket import NeurofeedbackWebsocketServer
@@ -14,7 +15,7 @@ from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 from brainground.ui.view import MainView
 
 class BiomarkerEntity:
-    type: BiomarkerTypes
+    type: BiomarkerType
     node: Biomarker
     widget: BaseBiomarkerWidget
 
@@ -30,8 +31,11 @@ class BiomarkerManager(QObject):
 
         self.view = view
 
-        self.view.biomarker_added.connect(self.add_biomarker)
-        self.view.biomarker_deleted.connect(self.remove_biomarker)
+
+        app = BraingroundApplication.instance()
+
+        app.request_biomarker_added.connect(self.add_biomarker)
+        app.request_biomarker_deleted.connect(self.remove_biomarker)
 
         self.ws = websocket
 
@@ -74,16 +78,16 @@ class BiomarkerManager(QObject):
 
         self.send_websocket()
 
-    def add_biomarker(self, type: BiomarkerTypes, name: str):
+    def add_biomarker(self, type: BiomarkerType, name: str):
         node = None
         widget = None
 
         match type:
-            case BiomarkerTypes.BANDPOWER:
-                node = BandpowerBiomarker(self.nextId, name)
+            case BiomarkerType.BANDPOWER:
+                node = BandpowerBiomarker(self.nextId, name, type)
                 widget = BandpowerWidget(node)
-            case BiomarkerTypes.ASYMMETRY:
-                node = AsymmetryBiomarker(self.nextId, name)
+            case BiomarkerType.ASYMMETRY:
+                node = AsymmetryBiomarker(self.nextId, name, type)
                 widget = AsymmetryWidget(node)
 
         self.nextId += 1
@@ -95,7 +99,7 @@ class BiomarkerManager(QObject):
 
         self.biomarkers.append(entity)
         self.view.add_biomarker_widget(entity.widget)
-        self.view.add_biomarker_to_sidebar(entity.node.iden)
+        BraingroundApplication.instance().biomarker_added.emit(node.iden)
 
     def remove_biomarker(self, id: int):
         found_idx = -1
@@ -107,5 +111,6 @@ class BiomarkerManager(QObject):
 
         if found_idx != -1:
             entity = self.biomarkers[found_idx]
-            self.view.remove_biomarker_widget(entity.widget)
+            # self.view.remove_biomarker_widget(entity.widget)
             del self.biomarkers[found_idx]
+            BraingroundApplication.instance().biomarker_deleted.emit(entity.node.iden.id())
