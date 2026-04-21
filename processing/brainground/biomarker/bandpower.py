@@ -1,8 +1,8 @@
 
 import numpy as np
 from scipy.integrate import simpson
-from biomarker.base import Biomarker
-from biomarker.types import FFT
+from brainground.biomarker.base import Biomarker
+from brainground.biomarker.types import FFT
 
 class BandpowerSettings():
     channels: list[int] = [0, 1]

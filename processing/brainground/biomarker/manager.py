@@ -2,14 +2,16 @@ from PySide6.QtCore import QObject, QTimer
 import numpy as np
 from scipy.signal import welch
 
-from biomarker.bandpower import BandpowerBiomarker
-from biomarker.base import Biomarker
-from biomarker.types import FFT, BiomarkerTypes
-from websocket import NeurofeedbackWebsocketServer
-from lsl_datasource import LSLDataSource
-from ui.biomarker.bandpower_widget import BandpowerWidget
-from ui.biomarker.base_widget import BaseBiomarkerWidget
-from ui.main_view import MainView2
+from brainground.biomarker.bandpower import BandpowerBiomarker
+from brainground.biomarker.base import Biomarker
+from brainground.biomarker.types import FFT, BiomarkerTypes
+from brainground.biomarker.asymmetry import AsymmetryBiomarker
+from brainground.ui.biomarker.asymmetry_widget import AsymmetryWidget
+from brainground.websocket import NeurofeedbackWebsocketServer
+from brainground.lsl_datasource import LSLDataSource
+from brainground.ui.biomarker.bandpower_widget import BandpowerWidget
+from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
+from brainground.ui.view import MainView
 
 class BiomarkerEntity:
     type: BiomarkerTypes
@@ -20,7 +22,7 @@ class BiomarkerManager(QObject):
     nextId = 1
     biomarkers: list[BiomarkerEntity] = []
 
-    def __init__(self, lsl_node: LSLDataSource, view: MainView2, websocket: NeurofeedbackWebsocketServer):
+    def __init__(self, lsl_node: LSLDataSource, view: MainView, websocket: NeurofeedbackWebsocketServer):
         self.refresh_rate = int(1000 / 20)
         self.lsl_node = lsl_node
         self.fft = FFT()
@@ -80,8 +82,7 @@ class BiomarkerManager(QObject):
             case BiomarkerTypes.BANDPOWER:
                 node = BandpowerBiomarker(self.nextId, name)
                 widget = BandpowerWidget(node)
-            case BiomarkerTypes.FAA:
-                 raise NotImplemented
+            case BiomarkerTypes.ASYMMETRY:
 
         self.nextId += 1
 
@@ -95,7 +96,6 @@ class BiomarkerManager(QObject):
         self.view.add_biomarker_to_sidebar(entity.node.iden)
 
     def remove_biomarker(self, id: int):
-        print(f"yo id: {id}")
         found_idx = -1
 
         for i, entity in enumerate(self.biomarkers):

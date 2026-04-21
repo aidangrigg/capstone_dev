@@ -1,17 +1,16 @@
 from PySide6.QtCore import Signal
-import numpy as np
-
 from PySide6.QtWidgets import QGridLayout, QHBoxLayout, QMainWindow, QVBoxLayout, QWidget
+import numpy as np
 from pyqtgraph import PlotWidget
 
-from biomarker.types import BiomarkerTypes
-from biomarker.base import BiomarkerIdentifier
-from ui.sidebar import Sidebar
-from ui.biomarker.base_widget import BaseBiomarkerWidget
+from brainground.biomarker.types import BiomarkerTypes
+from brainground.biomarker.base import BiomarkerIdentifier
+from brainground.ui.sidebar import Sidebar
+from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 
 AMPLITUDE_LIMIT = 100
 
-class MainView2(QMainWindow):
+class MainView(QMainWindow):
     biomarker_added = Signal(BiomarkerTypes, str)
     biomarker_deleted = Signal(int)
 

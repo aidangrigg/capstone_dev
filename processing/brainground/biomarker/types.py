@@ -3,7 +3,7 @@ import numpy as np
 
 class BiomarkerTypes(Enum):
     BANDPOWER = 1
-    FAA = 2
+    ASYMMETRY = 2
 
 class FFT:
     freqs: np.ndarray
@@ -12,5 +12,5 @@ class FFT:
 
     def clear(self):
         self.freqs = np.empty(1)
-        self.psd: list[ndarray] = []
+        self.psd: list[np.ndarray] = []
         self.resolution = 0.0

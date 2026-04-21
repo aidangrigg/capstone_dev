@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from PySide6.QtCore import Signal, QObject
 from numpy import ndarray
 
-from biomarker.types import FFT
+from brainground.biomarker.types import FFT
 
 class BiomarkerIdentifier(QObject):
     name_changed = Signal(str)

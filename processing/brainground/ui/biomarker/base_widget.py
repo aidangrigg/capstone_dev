@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QWidget
 
-from biomarker.base import Biomarker
+from brainground.biomarker.base import Biomarker
 
 
 class BaseBiomarkerWidget(ABC):
