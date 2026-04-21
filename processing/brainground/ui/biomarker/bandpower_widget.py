@@ -112,6 +112,9 @@ class BandpowerWidget(BaseBiomarkerWidget):
         plot_widget.addItem(self.plot)
         self.layout.addWidget(plot_widget)
 
+        ax = plot_widget.getAxis("bottom")
+        ax.setTicks([[]])
+
     def update(self):
         delta = self.node.score
         self.plot.setOpts(x=[0], height=[delta], brushes=('g' if delta > 0 else 'r'))
