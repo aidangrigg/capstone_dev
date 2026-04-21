@@ -1,19 +1,11 @@
 
 from brainground.biomarker.bandpower import BandpowerBiomarker, BandpowerSettings
+from brainground.biomarker.types import FrequencyBands
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 
 import copy
 from PySide6.QtWidgets import QDialog, QDoubleSpinBox, QFormLayout, QRadioButton, QGridLayout, QDialogButtonBox, QButtonGroup, QCheckBox
 from pyqtgraph import BarGraphItem, PlotWidget
-
-FREQUENCY_BANDS = {
-    "Delta": (0.0, 3.0),
-    "Theta": (3.0, 7.0),
-    "Alpha": (7.0, 12.0),
-    "SMR": (12.0, 16.0),
-    "Beta": (12.0, 30.0),
-    "Gamma": (30.0, 50.0),
-}
 
 class GridLayout(QGridLayout):
     def __init__(self, columns: int, parent=None):
@@ -54,11 +46,11 @@ class BandpowerSettingsDialog(QDialog):
 
         self.freq_button_group = QButtonGroup()
         freq_button_layout = GridLayout(2)
-        for band, val in FREQUENCY_BANDS.items():
-            radio_button = QRadioButton(band)
+        for band in FrequencyBands:
+            radio_button = QRadioButton(band.name.capitalize())
             radio_button.clicked.connect(self.freq_button_pressed)
 
-            if val == old_settings.band:
+            if band == old_settings.band:
                 radio_button.setChecked(True)
 
             self.freq_button_group.addButton(radio_button)
@@ -88,7 +80,10 @@ class BandpowerSettingsDialog(QDialog):
         self.settings.baseline = val
 
     def freq_button_pressed(self):
-        self.settings.band = FREQUENCY_BANDS[self.freq_button_group.checkedButton().text()]
+        for band in FrequencyBands:
+            if band.name.lower() == self.freq_button_group.checkedButton().text().lower():
+                self.settings.band = band
+                return
 
     def channel_button_pressed(self):
         self.settings.channels = []
