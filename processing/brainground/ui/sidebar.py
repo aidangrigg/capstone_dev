@@ -113,7 +113,7 @@ class Sidebar(QWidget):
 
         layout.addLayout(button_layout)
 
-        application = BraingroundApplication.instance()
+        application = BraingroundApplication.get_app()
         application.biomarker_added.connect(self.add_biomarker)
         application.biomarker_deleted.connect(self.remove_biomarker)
 
@@ -133,7 +133,7 @@ class Sidebar(QWidget):
 
         if dialog.exec_():
             print(f"Sidebar add signal: {(dialog.type, dialog.name)}")
-            BraingroundApplication.instance().request_biomarker_added.emit(dialog.type, dialog.name)
+            BraingroundApplication.get_app().request_biomarker_added.emit(dialog.type, dialog.name)
             # self.biomarker_added.emit(dialog.type, dialog.name)
 
     def spawn_remove_dialog(self):
@@ -151,7 +151,7 @@ class Sidebar(QWidget):
             )
 
             if button == QMessageBox.StandardButton.Discard:
-                BraingroundApplication.instance().request_biomarker_deleted.emit(iden.id())
+                BraingroundApplication.get_app().request_biomarker_deleted.emit(iden.id())
 
                 # self.biomarker_deleted.emit(iden.id())
                 # self.remove_biomarker(iden.id())

@@ -1,4 +1,5 @@
 
+from brainground.application import BraingroundApplication
 from brainground.biomarker.bandpower import BandpowerBiomarker, BandpowerSettings
 from brainground.biomarker.types import FrequencyBand
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
@@ -7,13 +8,13 @@ import copy
 from PySide6.QtWidgets import QDialog, QDoubleSpinBox, QFormLayout, QRadioButton, QGridLayout, QDialogButtonBox, QButtonGroup, QCheckBox
 from pyqtgraph import BarGraphItem, PlotWidget
 
+# TODO: deduplicate this (between this and asymemtry_widget.py)
 class GridLayout(QGridLayout):
     def __init__(self, columns: int, parent=None):
         super().__init__(parent)
         self.cols = columns
         self.i, self.j = 0, 0
 
-    # TODO: better name for this
     def addWidgetCell(self, widget):
         self.addWidget(widget, self.j, self.i)
         self.i += 1
@@ -32,8 +33,7 @@ class BandpowerSettingsDialog(QDialog):
 
         channel_button_layout = GridLayout(2)
         self.channel_buttons = []
-        # TODO: work out a way to pass channel count to here
-        for ch in range(4):
+        for ch in range(BraingroundApplication.get_app().settings.channel_count):
             checkbox = QCheckBox(f"{ch + 1}")
             checkbox.clicked.connect(self.channel_button_pressed)
 

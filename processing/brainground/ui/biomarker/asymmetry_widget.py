@@ -1,4 +1,5 @@
 
+from brainground.application import BraingroundApplication
 from brainground.biomarker.asymmetry import AsymmetrySettings, AsymmetryBiomarker
 from brainground.biomarker.types import FrequencyBand
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
@@ -13,7 +14,6 @@ class GridLayout(QGridLayout):
         self.cols = columns
         self.i, self.j = 0, 0
 
-    # TODO: better name for this
     def addWidgetCell(self, widget):
         self.addWidget(widget, self.j, self.i)
         self.i += 1
@@ -30,10 +30,11 @@ class AsymmetrySettingsDialog(QDialog):
 
         self.form = QFormLayout()
 
+        channel_count = BraingroundApplication.get_app().settings.channel_count
+
         left_channel_layout = GridLayout(2)
         self.left_channel_buttons = []
-        # TODO: work out a way to pass channel count to here
-        for ch in range(4):
+        for ch in range(channel_count):
             checkbox = QRadioButton(f"{ch + 1}")
             checkbox.clicked.connect(self.left_channel_changed)
 
@@ -46,8 +47,8 @@ class AsymmetrySettingsDialog(QDialog):
 
         right_channel_layout = GridLayout(2)
         self.right_channel_buttons = []
-        # TODO: work out a way to pass channel count to here
-        for ch in range(4):
+
+        for ch in range(channel_count):
             checkbox = QRadioButton(f"{ch + 1}")
             checkbox.clicked.connect(self.right_channel_changed)
 
