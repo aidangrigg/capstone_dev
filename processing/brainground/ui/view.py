@@ -18,9 +18,9 @@ class MainView(QMainWindow):
         layout = QHBoxLayout(container)
         self.setCentralWidget(container)
 
-        self.channel_count = 4
-        self.time_window = 10
-        self.sampling_rate = 250
+        channel_count = BraingroundApplication.get_app().settings.channel_count
+        window_size = BraingroundApplication.get_app().settings.window_size
+        sampling_rate = BraingroundApplication.get_app().settings.sampling_rate
 
         plot_layout = QVBoxLayout()
 
@@ -30,13 +30,13 @@ class MainView(QMainWindow):
         self.voltage_plot.showGrid(x=True, y=True, alpha=0.3)
         self.voltage_plot.setLabels(left="Channels", bottom="Time (s)")
         self.voltage_plot.getViewBox().setMouseEnabled(x=False, y=False) # type: ignore
-        self.voltage_plot.setYRange(0, self.channel_count)
-        self.voltage_plot.setXRange(-self.time_window, 0)
+        self.voltage_plot.setYRange(0, channel_count)
+        self.voltage_plot.setXRange(-window_size, 0)
         self.voltage_plot.getAxis("left").setTicks(
             [
                 [
-                    (self.channel_count - i - 0.5, f"CH{i + 1}")
-                    for i in range(self.channel_count)
+                    (channel_count - i - 0.5, f"CH{i + 1}")
+                    for i in range(channel_count)
                 ]
             ]
         )
@@ -56,7 +56,7 @@ class MainView(QMainWindow):
         self.colors = "rgbycmwr"
         self.time_domain_curves = []
         self.freq_domain_curves = []
-        for i in range(self.channel_count):
+        for i in range(channel_count):
             # Each channel gets its own colored curve
             self.freq_domain_curves.append(
                 self.psd_plot.plot(
@@ -81,13 +81,15 @@ class MainView(QMainWindow):
 
         self.grid_idx = [0, 0]
 
-        self.t_vec = np.arange(-self.time_window * self.sampling_rate, 0) / self.sampling_rate
+        self.t_vec = np.arange(-window_size * sampling_rate, 0) / sampling_rate
 
-        BraingroundApplication.instance().biomarker_deleted.connect(self.remove_biomarker_widget)
+        BraingroundApplication.get_app().biomarker_deleted.connect(self.remove_biomarker_widget)
 
     def set_eeg_plot(self, data):
+        channel_count = BraingroundApplication.get_app().settings.channel_count
+
         for ch, curve in enumerate(self.time_domain_curves):
-            offset = self.channel_count - ch - 0.5
+            offset = channel_count - ch - 0.5
             curve.setData(
                 self.t_vec, data[:, ch] / AMPLITUDE_LIMIT / 2 + offset
             )

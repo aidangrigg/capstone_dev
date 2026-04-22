@@ -32,8 +32,7 @@ class BiomarkerManager(QObject):
         self.view = view
 
 
-        app = BraingroundApplication.instance()
-
+        app = BraingroundApplication.get_app()
         app.request_biomarker_added.connect(self.add_biomarker)
         app.request_biomarker_deleted.connect(self.remove_biomarker)
 
@@ -99,7 +98,7 @@ class BiomarkerManager(QObject):
 
         self.biomarkers.append(entity)
         self.view.add_biomarker_widget(entity.widget)
-        BraingroundApplication.instance().biomarker_added.emit(node.iden)
+        BraingroundApplication.get_app().biomarker_added.emit(node.iden)
 
     def remove_biomarker(self, id: int):
         found_idx = -1
@@ -113,4 +112,4 @@ class BiomarkerManager(QObject):
             entity = self.biomarkers[found_idx]
             # self.view.remove_biomarker_widget(entity.widget)
             del self.biomarkers[found_idx]
-            BraingroundApplication.instance().biomarker_deleted.emit(entity.node.iden.id())
+            BraingroundApplication.get_app().biomarker_deleted.emit(entity.node.iden.id())

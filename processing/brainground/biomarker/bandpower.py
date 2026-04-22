@@ -30,5 +30,4 @@ class BandpowerBiomarker(Biomarker):
 
         bp = bp_total / len(self.settings.channels)
 
-        # TODO: compute difference from average
         self.score = bp - self.settings.baseline

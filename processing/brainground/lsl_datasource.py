@@ -6,6 +6,8 @@ import scipy.signal as sp
 from collections import deque
 import time
 
+from brainground.application import BraingroundApplication
+
 class LSLDataSource(QObject):
     samples_recieved = Signal(np.ndarray)
 
@@ -37,6 +39,11 @@ class LSLDataSource(QObject):
             self.connected = True
             self.channel_count = self._info.channel_count()
             self.sampling_rate = self._info.nominal_srate()
+
+            app = BraingroundApplication.get_app()
+            app.settings.channel_count = self.channel_count
+            app.settings.sampling_rate = self.sampling_rate
+
             return True
         except lsl.util.TimeoutError:
             return False
@@ -74,7 +81,6 @@ class LSLDataSource(QObject):
         notch_b, notch_a = None, None
         if bandpass is not None:
             nyq = 0.5 * self.sampling_rate
-            # TODO: configuring butterworth order
             sos_butter_filter = sp.butter(4, [bandpass[0] / nyq, bandpass[1] / nyq], btype='band', output='sos')
             if self._butter_zi is None:
                 self._butter_zi = [sp.sosfilt_zi(sos_butter_filter) * [0] for _ in range(self.channel_count)]

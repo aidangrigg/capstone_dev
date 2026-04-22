@@ -16,8 +16,12 @@ AMPLITUDE_LIMIT = 100
 if __name__ == "__main__":
     app = BraingroundApplication(sys.argv)
 
-    view = MainView()
+    # TODO: currently lsl_node has to be initialized first
+    # (as it gets the sampling rate/ channel count that MainView depends on)
+    # Either make this clearer or remove this required ordering (make view able to dynamically update
+    # to changing eeg channels
     lsl_node = LSLDataSource()
+    view = MainView()
     ws = NeurofeedbackWebsocketServer()
 
     manager = BiomarkerManager(lsl_node, view, ws)
