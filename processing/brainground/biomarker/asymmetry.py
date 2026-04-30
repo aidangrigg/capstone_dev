@@ -1,4 +1,5 @@
 
+import logging
 import numpy as np
 from scipy.integrate import simpson
 
@@ -29,3 +30,4 @@ class AsymmetryBiomarker(Biomarker):
         right_bp = simpson(fft.psd[self.settings.right_channel][idxs], dx=fft.resolution)
 
         self.score = right_bp - left_bp
+        logging.info("New asymmetry score computed for %s, value: %d", self.iden.name(), self.score)

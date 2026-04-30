@@ -1,3 +1,4 @@
+import logging
 from PySide6.QtCore import QJsonDocument, QJsonValue, QObject
 from PySide6.QtNetwork import QHostAddress
 from PySide6.QtWebSockets import QWebSocketServer, QWebSocket
@@ -7,22 +8,27 @@ WS_SERVER_NAME = "Neurofeedback Score WS Server"
 class NeurofeedbackWebsocketServer(QObject):
     sockets: list[QWebSocket] = []
 
-    def __init__(self):
-
+    def __init__(self, addr: QHostAddress | QHostAddress.SpecialAddress = QHostAddress.SpecialAddress.LocalHost, port: int = 1234):
         super().__init__()
 
-        self.server = QWebSocketServer(WS_SERVER_NAME, QWebSocketServer.SslMode.NonSecureMode, self)
+        logging.debug("Initialising websocket server at <%s:%d>", addr, port)
 
-        if not self.server.listen(QHostAddress.SpecialAddress.LocalHost, 1234):
+        self.server = QWebSocketServer(WS_SERVER_NAME, QWebSocketServer.SslMode.NonSecureMode, self)
+        if not self.server.listen(addr, port):
             return
+
+        logging.debug("Websocket server successfully initialised!")
+
         self.server.newConnection.connect(self.on_new_connection)
 
     def on_new_connection(self):
         socket = self.server.nextPendingConnection()
         if socket is not None and socket.isValid():
+            logging.debug("New connection to websocket server!")
             self.sockets.append(socket)
 
     def send_packet(self, packet: dict):
+        logging.debug("Sending packet over websocket %s", packet)
         self.sockets = list(filter(lambda s: s.isValid(), self.sockets))
 
         json_doc: dict[str, QJsonValue] = {}

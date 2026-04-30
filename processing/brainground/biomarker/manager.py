@@ -31,7 +31,6 @@ class BiomarkerManager(QObject):
 
         self.view = view
 
-
         app = BraingroundApplication.get_app()
         app.request_biomarker_added.connect(self.add_biomarker)
         app.request_biomarker_deleted.connect(self.remove_biomarker)
@@ -39,7 +38,7 @@ class BiomarkerManager(QObject):
         self.ws = websocket
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update_biomarkers)
+        self.timer.timeout.connect(self.run)
         self.timer.start(int(self.refresh_rate))
 
     def compute_fft(self):
@@ -65,7 +64,7 @@ class BiomarkerManager(QObject):
 
         self.ws.send_packet(packet)
 
-    def update_biomarkers(self):
+    def run(self):
         self.compute_fft()
 
         self.view.set_eeg_plot(self.lsl_node.buf)

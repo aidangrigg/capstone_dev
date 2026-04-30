@@ -1,4 +1,4 @@
-
+import logging
 from typing import Sequence, cast
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QApplication
@@ -22,6 +22,9 @@ class BraingroundApplication(QApplication):
 
     def __init__(self, arguments: Sequence[str]):
         super().__init__(arguments)
+
+        # TODO: configure this through cli
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
     @classmethod
     def get_app(cls) -> "BraingroundApplication":
