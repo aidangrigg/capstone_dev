@@ -1,9 +1,8 @@
 from PySide6.QtWidgets import QGridLayout, QHBoxLayout, QMainWindow, QVBoxLayout, QWidget
 import numpy as np
-from pyqtgraph import PlotWidget
+import pyqtgraph as pg
 
 from brainground.application import BraingroundApplication
-from brainground.biomarker.base import BiomarkerIdentifier
 from brainground.ui.sidebar import Sidebar
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 
@@ -12,6 +11,9 @@ AMPLITUDE_LIMIT = 100
 class MainView(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        pg.setConfigOption('background', 'w')
+        pg.setConfigOption('foreground', 'k')
 
         self.setWindowTitle("Brainground Neurofeedback Processing")
         container = QWidget()
@@ -25,7 +27,7 @@ class MainView(QMainWindow):
         plot_layout = QVBoxLayout()
 
         # Voltage plot (leftmost, plots mV/t)
-        voltage_widget: PlotWidget = PlotWidget()
+        voltage_widget: pg.PlotWidget = pg.PlotWidget()
         self.voltage_plot: PlotItem = voltage_widget.getPlotItem() # type: ignore
         self.voltage_plot.showGrid(x=True, y=True, alpha=0.3)
         self.voltage_plot.setLabels(left="Channels", bottom="Time (s)")
@@ -43,7 +45,7 @@ class MainView(QMainWindow):
         plot_layout.addWidget(voltage_widget)
 
         # PSD plot (center, plots (V^2/Hz))
-        psd_widget = PlotWidget()
+        psd_widget = pg.PlotWidget()
         self.psd_plot: PlotItem = psd_widget.getPlotItem() # type: ignore
         self.psd_plot.showGrid(x=True, y=True, alpha=0.3)
         self.psd_plot.setLabels(left="Power spectral density (V^2 / Hz)", bottom="frequency (Hz)")
@@ -118,4 +120,3 @@ class MainView(QMainWindow):
         if self.grid_idx[1] >= 2:
             self.grid_idx[0] += 1
             self.grid_idx[1] = 0
-

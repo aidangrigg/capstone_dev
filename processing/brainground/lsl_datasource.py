@@ -1,3 +1,5 @@
+import logging
+
 from PySide6.QtCore import QObject, QTimer, Signal
 from numpy.typing import NDArray
 import pylsl as lsl
@@ -14,11 +16,14 @@ class LSLDataSource(QObject):
     def __init__(self, window_length: float = 10.0):
         super().__init__()
 
+        logging.debug("Initialising LSLDataSource...")
+
         self.connected = False
         self._window_length = window_length
         self._butter_zi: list[NDArray[np.float64]] | None = None
         self._notch_zi: list[NDArray[np.float64]] | None = None
         streams = self.get_streams()
+        logging.debug("%d streams found!", len(streams))
         self.connect_stream(streams[0])
 
         self.timer = QTimer()
@@ -26,6 +31,7 @@ class LSLDataSource(QObject):
         self.timer.start(int(1000 / 100))
 
     def get_streams(self) -> list[lsl.StreamInfo]:
+        logging.debug("Getting EEG streams...")
         return lsl.resolve_byprop("type", "EEG")
 
     def connect_stream(self, stream: lsl.StreamInfo, timeout: float = 60.0) -> bool:
@@ -43,6 +49,14 @@ class LSLDataSource(QObject):
             app = BraingroundApplication.get_app()
             app.settings.channel_count = self.channel_count
             app.settings.sampling_rate = self.sampling_rate
+
+            logging.info(
+                "LSL stream connected with the following info:\n\
+                \tName           : %s\n\
+                \tChannel count  : %d\n\
+                \tChannel labels : %s\n\
+                \tSampling rate  : %f\n",
+                self._info.name(), self._info.channel_count(), self._info.get_channel_labels(), self._info.nominal_srate())
 
             return True
         except lsl.util.TimeoutError:
@@ -93,6 +107,7 @@ class LSLDataSource(QObject):
         samples, timestamps = self._inlet.pull_chunk(timeout = 0.0)
 
         if timestamps and samples:
+            logging.debug("Read in %d new samples", len(samples))
             for sample in samples:
                 if bandpass is not None:
                     self._bandpass_sample(sample, sos_butter_filter)
@@ -111,5 +126,4 @@ if __name__ == "__main__":
     datasource = LSLDataSource()
     while(True):
         time.sleep(1)
-        print(f"samples: {datasource.pull_samples()}")
 

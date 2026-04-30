@@ -1,4 +1,5 @@
 
+import logging
 from PySide6.QtCore import QAbstractListModel, QModelIndex, QPersistentModelIndex, Qt
 from PySide6.QtWidgets import QComboBox, QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QListView, QMessageBox, QPushButton, QVBoxLayout, QWidget
 
@@ -118,6 +119,7 @@ class Sidebar(QWidget):
         application.biomarker_deleted.connect(self.remove_biomarker)
 
     def add_biomarker(self, iden: BiomarkerIdentifier):
+        logging.debug("Added sidebar biomarker row")
         self.bm_model.add(iden)
 
     def remove_biomarker(self, id: int):
@@ -126,13 +128,14 @@ class Sidebar(QWidget):
             iden = self.bm_model.getIden(idx)
 
             if iden.id() == id:
+                logging.debug("Removed sidebar biomarker row")
                 self.bm_model.removeRow(i)
 
     def spawn_add_dialog(self):
         dialog = AddDialog()
 
         if dialog.exec_():
-            print(f"Sidebar add signal: {(dialog.type, dialog.name)}")
+            logging.info("New biomarker requested, (%s, %s)", dialog.type, dialog.name)
             BraingroundApplication.get_app().request_biomarker_added.emit(dialog.type, dialog.name)
             # self.biomarker_added.emit(dialog.type, dialog.name)
 
@@ -151,7 +154,5 @@ class Sidebar(QWidget):
             )
 
             if button == QMessageBox.StandardButton.Discard:
+                logging.info("Delete of biomarker (id: %d) requested.", iden.id())
                 BraingroundApplication.get_app().request_biomarker_deleted.emit(iden.id())
-
-                # self.biomarker_deleted.emit(iden.id())
-                # self.remove_biomarker(iden.id())

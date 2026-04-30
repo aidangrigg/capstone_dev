@@ -1,4 +1,5 @@
 
+import logging
 import numpy as np
 from scipy.integrate import simpson
 from brainground.biomarker.base import Biomarker
@@ -31,3 +32,4 @@ class BandpowerBiomarker(Biomarker):
         bp = bp_total / len(self.settings.channels)
 
         self.score = bp - self.settings.baseline
+        logging.info("New bandpower score computed for %s, value: %d", self.iden.name(), self.score)
