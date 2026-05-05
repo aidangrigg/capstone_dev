@@ -17,8 +17,10 @@ class FFT:
     freqs: np.ndarray
     psd: list[np.ndarray]
     resolution = 0.0
+    total_bandpower: list[float] = []
 
     def clear(self):
         self.freqs = np.empty(1)
         self.psd: list[np.ndarray] = []
         self.resolution = 0.0
+        self.total_bandpower = []
