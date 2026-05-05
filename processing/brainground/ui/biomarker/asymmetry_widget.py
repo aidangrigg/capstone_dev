@@ -5,7 +5,7 @@ from brainground.biomarker.types import FrequencyBand
 from brainground.ui.biomarker.base_widget import BaseBiomarkerWidget
 
 import copy
-from PySide6.QtWidgets import QDialog, QFormLayout, QRadioButton, QGridLayout, QDialogButtonBox, QButtonGroup
+from PySide6.QtWidgets import QDialog, QFormLayout, QRadioButton, QGridLayout, QDialogButtonBox, QButtonGroup, QCheckBox
 from pyqtgraph import BarGraphItem, PlotWidget
 
 class GridLayout(QGridLayout):
@@ -31,6 +31,10 @@ class AsymmetrySettingsDialog(QDialog):
         self.form = QFormLayout()
 
         channel_count = BraingroundApplication.get_app().settings.channel_count
+
+        self.relative_checkbox = QCheckBox("Relative")
+        self.relative_checkbox.clicked.connect(self.relative_checkbox_pressed)
+        self.form.addRow("Relative asymmetry", self.relative_checkbox)
 
         left_channel_layout = GridLayout(2)
         self.left_channel_buttons = []
@@ -84,6 +88,9 @@ class AsymmetrySettingsDialog(QDialog):
         self.setLayout(self.form)
 
         self.adjustSize()
+
+    def relative_checkbox_pressed(self):
+        self.settings.relative = self.relative_checkbox.isChecked()
 
     def left_channel_changed(self):
         for btn in self.left_channel_buttons:
