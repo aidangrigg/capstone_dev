@@ -31,6 +31,11 @@ class BandpowerSettingsDialog(QDialog):
 
         self.form = QFormLayout()
 
+        self.relative_checkbox = QCheckBox("Relative")
+        self.relative_checkbox.clicked.connect(self.relative_checkbox_pressed)
+        self.form.addRow("Relative bandpower", self.relative_checkbox)
+
+
         channel_button_layout = GridLayout(2)
         self.channel_buttons = []
         for ch in range(BraingroundApplication.get_app().settings.channel_count):
@@ -75,6 +80,9 @@ class BandpowerSettingsDialog(QDialog):
         self.setLayout(self.form)
 
         self.adjustSize()
+
+    def relative_checkbox_pressed(self):
+        self.settings.relative = self.relative_checkbox.isChecked()
 
     def baseline_value_changed(self, val: float):
         self.settings.baseline = val

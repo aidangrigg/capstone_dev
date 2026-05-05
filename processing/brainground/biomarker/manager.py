@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, QTimer
 import numpy as np
 from scipy.signal import welch
+from scipy.integrate import simpson
 
 from brainground.application import BraingroundApplication
 from brainground.biomarker.bandpower import BandpowerBiomarker
@@ -46,8 +47,12 @@ class BiomarkerManager(QObject):
 
         for ch in range(self.lsl_node.channel_count):
             freqs, psd = welch(self.lsl_node.buf[:, ch], self.lsl_node.sampling_rate, axis=0, nperseg=int(2.5 * self.lsl_node.sampling_rate))
+            resolution = freqs[1] - freqs[0]
             self.fft.freqs = freqs
             self.fft.psd.append(psd)
+            idxs = np.logical_and(freqs >= 0.0,  freqs <= 45.0)
+            total_bandpower = simpson(self.fft.psd[ch][idxs], dx=resolution)
+            self.fft.total_bandpower.append(total_bandpower)
 
         self.fft.resolution = self.fft.freqs[1] - self.fft.freqs[0]
 
