@@ -29,5 +29,5 @@ class AsymmetryBiomarker(Biomarker):
         left_bp = simpson(fft.psd[self.settings.left_channel][idxs], dx=fft.resolution)
         right_bp = simpson(fft.psd[self.settings.right_channel][idxs], dx=fft.resolution)
 
-        self.score = left_bp - right_bp
+        self.score = right_bp - left_bp
         logging.info("New asymmetry score computed for %s, value: %d", self.iden.name(), self.score)
