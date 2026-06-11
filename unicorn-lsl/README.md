@@ -1,23 +1,14 @@
-# Datastream
+# Unicorn LSL
 
 NOTE: This software is built specifically for Linux. If using Windows, try the "Unicorn LSL" software that can be used through the [Unicorn Suite](https://www.gtec.at/product/unicorn-suite/).
 
-(TODO: proper description)
+## Setup
 
-## Building
+Using [nix](https://nixos.org/) is the supported method for installing dependencies. The required dependencies can be installed within a dev environment using `nix develop`.
 
-### Dependencies
+The required dependencies may also be installed manually. Look into `flake.nix` in order to find the required packages needed to run the project.
 
-#### Nix
-
-(TODO: write proper nix build script)
-Run `nix develop` in this directory
-
-#### Other distros
-
-(TODO: list required deps)
-
-### Instructions
+### Building
 
 `cd` into the `datastream/` directory and run the following commands.
 
