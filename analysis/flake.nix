@@ -9,33 +9,57 @@
       system: let
         pkgs = import nixpkgs { inherit system; };
       in {
-        devShells.default = pkgs.mkShell {
-          venvDir = ".venv";
+        devShells.default =
+          let
+            pythonVersion = pkgs.python312;
+            pythonPackages = pythonVersion.pkgs;
+            pyxdf = pythonPackages.buildPythonPackage rec {
+              pname = "pyxdf";
+              version = "1.17.4";
 
-          postShellHook = ''
-            export LD_LIBRARY_PATH=${pkgs.liblsl}/lib:$LD_LIBRARY_PATH
-          '';
+              pyproject = true;
 
-          packages = let
-            pythonPackages = pkgs.python312.pkgs;
+              build-system = [
+                pythonPackages.hatchling
+                pythonPackages.hatch-vcs
+              ];
+
+              src = pythonPackages.fetchPypi{
+                inherit version;
+                inherit pname;
+                sha256 = "sha256-N04+MGpSd9DuniSCrcsiEebgWXWP86/PVvORkkXa4qw=";
+              };
+
+              buildInputs = [ pythonPackages.numpy ];
+            };
           in
-            with pythonPackages; [
-              pip
+            pkgs.mkShell {
+              venvDir = ".venv";
 
-              numpy
-              mne
-              scipy
-              scipy-stubs
-              pylsl
-              pkgs.liblsl
+              postShellHook = ''
+                export LD_LIBRARY_PATH=${pkgs.liblsl}/lib:$LD_LIBRARY_PATH
+              '';
 
-              pyttsx3
-              pkgs.espeak
+              packages = with pythonPackages; [
+                pip
 
-              pkgs.pyright
-              black
-            ];
-        };
+                mne
+                pyxdf
+
+                pandas
+
+                matplotlib
+                numpy
+                scipy
+                scipy-stubs
+
+                pyttsx3
+                pkgs.espeak
+
+                pkgs.pyright
+                pkgs.liblsl
+              ];
+            };
       }
     );
 }
