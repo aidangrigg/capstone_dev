@@ -1,0 +1,77 @@
+{
+  "instruction1": {
+    "text": "Hello, and welcome to the experiment",
+    "delay": 0,
+    "unity_commands": [
+      { "command": "init", "args": [] }
+    ],
+    "lsl_marker_name": "introduction"
+  },
+  "baseline_start": {
+    "text": "Please look forward and relax. Try to limit your movements",
+    "delay": 180,
+    "unity_commands": [
+      { "command": "baseline_start", "args": [] }
+    ],
+    "lsl_marker_name": "baseline_start"
+  },
+  "rest0": {
+    "text": "Please rest for 30 seconds",
+    "delay": 30,
+    "unity_commands": [
+      { "command": "baseline_end", "args": [] }
+    ],
+    "lsl_marker_name": "baseline_end"
+  },
+  "faa_training": {
+    "text": "Please try to increase the brightness in the scene",
+    "delay": 300,
+    "unity_commands": [
+      { "command": "feedback_enable", "args": [ "light" ] }
+    ],
+    "lsl_marker_name": "faa_start"
+  },
+  "rest1": {
+    "text": "Please rest for 30 seconds",
+    "delay": 30,
+    "unity_commands": [
+      { "command": "feedback_disable", "args": [ "light" ] }
+    ],
+    "lsl_marker_name": "faa_end"
+  },
+  "theta_training": {
+    "text": "Please try to decrease the volume of the wind in the scene",
+    "delay": 300,
+    "unity_commands": [
+      { "command": "baseline", "args": [ 0 ] },
+      { "command": "feedback_enable", "args": [ "light" ] }
+    ],
+    "lsl_marker_name": "theta_start"
+  },
+  "rest2": {
+    "text": "Please rest for 30 seconds",
+    "delay": 30,
+    "unity_commands": [
+      { "command": "feedback_disable", "args": [ "wind" ] }
+    ],
+    "lsl_marker_name": "theta_end"
+  },
+  "faa_theta_training": {
+    "text": "Please try to increase the brightness and decrease the volume of the wind in the scene",
+    "delay": 300,
+    "unity_commands": [
+      { "command": "feedback_enable", "args": [ "light" ] },
+      { "command": "feedback_enable", "args": [ "wind" ] }
+    ],
+    "lsl_marker_name": "faa_theta_start"
+  },
+  "end": {
+    "text": "This concludes the experiment. Thank you for your participation!",
+    "delay": 0,
+    "unity_commands": [
+      { "command": "feedback_disable", "args": [ "light" ] },
+      { "command": "feedback_disable", "args": [ "wind" ] }
+    ],
+    "lsl_marker_name": "faa_theta_end"
+  }
+}
