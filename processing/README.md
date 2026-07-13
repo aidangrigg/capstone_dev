@@ -15,7 +15,7 @@ The following contains the primary EEG and neurofeedback processing logic for th
 
 1. Install Python 3.12 (or any other compatible version of python)
 2. (Optionally) create and activate a python virtual environment `python -m venv .venv && ./.venv/Scripts/activate` (rather than installing packages globally)
-3. Install required dependencies: `pip install ...`
+3. Install required dependencies: `pip install numpy scipy pylsl pyqtgraph pyside6`
 
 ## Running
 

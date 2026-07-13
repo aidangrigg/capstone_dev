@@ -1,13 +1,21 @@
 # exg-lsl
 
+A helper script to connect to the NCBCI 4ch EEG headset using Bluetooth, and exposing the data over Lab Streaming Layer.
+
 ## Setup
 
-Using [nix](https://nixos.org/) is the supported method for installing dependencies. The required dependencies can be installed within a dev environment using `nix develop`.
+### Nix (recommended if using Linux)
 
-The required dependencies can also be installed manually. Look into `flake.nix` in order to find the required packages needed to run the project.
+0. Install the [nix](https://nixos.org/) package manager.
+1. Run `nix develop`.
+
+### Windows
+
+1. Install Python 3.12 (or any other compatible version of python)
+2. (Optionally) create and activate a python virtual environment `python -m venv .venv && ./.venv/Scripts/activate` (rather than installing packages globally)
+3. Install required dependencies: `pip install numpy scipy pylsl pyqtgraph pyside6`
 
 ## Running
 
-`python main.py`
-
+Run the project using `python main.py`. A GUI should launch showing a simple interface that can be used to connect to the EEG headset.
 
