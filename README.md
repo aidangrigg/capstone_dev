@@ -11,10 +11,18 @@ Brainground is a closed-loop, multi-protocol neurofeedback training environment 
 This project is broken up into several programs, instructions for each can be found in the `README.md` in their individual directory. The following is brief description of what each program does:
 1. `unicorn-lsl/`: Grabs data from the g.tec Unicorn Hybrid Black over bluetooth and streams it using the LSL. Is also able to record a stream to a file, and replay the stream as if it was in real-time to make it easier to test other components.
 2. `exg-lsl/`: Grabs data from a custom 4 channel EEG device and outputs an LSL stream. Connection to the EEG device is done over Bluetooth Low Energy and controlled through a simple GUI.
-3. `processing/`: Pulls in EEG data from an LSL stream, filters and processes it, and then outputs a neurofeedback score to a web socket server. Parameters related to the neurofeedback metric are configurable through the GUI. The GUI also displays various graphs to visually inspect the live data.
+3. `processing/`: Pulls in EEG data from an LSL stream, filters and processes it, and then outputs a neurofeedback score to a web socket server. Parameters related to the neurofeedback metrics are configurable through the GUI. The GUI also displays various graphs to visually inspect the live data.
 4. `lsl_subscriber/`: Contains random helper scripts to help debug and visualise LSL streams.
-4. `analysis/`: Contains all the code used to analyse the data collected for the project. Also, contains the script that controlled the TTS during the experiment.
+4. `analysis/`: Contains all the code used to analyse the data collected for the project.
+5. `experiment/`: Contains a helper script used to run the experiment. Can be configured to support arbitrary training blocks, and sends markers for block start & end via an LSL stream.
+6. `unity-project/`: Contains a VR unity project that acts as the "feedback" portion of the project.
 
 ## Architecture
 
+![A diagram showing the overall architecture of the project](./docs/images/architecture.png "Software architecture")
+
+The above diagram shows the general software architecture of project, and generally how each of the components interact with one another. The following shows how what each section corresponds to within the project structure:
+- The data inlet corresponds to either `unicorn-lsl/` or `exg-lsl/`, depending on the EEG headset used.
+- The data processing section corresponds to the `processing/` subdirectory.
+- The VR scenario corresponds to the `unity-project/` subdirectory.
 
