@@ -1,6 +1,8 @@
 # Brainground
 
-![An image showing a VR headset with EEG electrodes attached at F3 and F4 positions](./docs/images/vr-headset-photo.png "VR Headset") ![An image showing a unity scenario with a beach environment](./docs/images/vr-environment.png "VR beach environment")
+VR/EEG Headset             |  Unity beach scenario
+:-------------------------:|:-------------------------:
+![An image showing a VR headset with EEG electrodes attached at F3 and F4 positions](./docs/images/vr-headset-photo.png "VR Headset")  |  ![An image showing a unity scenario with a beach environment](./docs/images/vr-environment.png "VR beach environment")
 
 Brainground is a closed-loop, multi-protocol neurofeedback training environment for virtual reality. It supports custom, user-configurable neurofeedback training protocols, and displays the feedback through the use of an immersive and relaxing beach scenario. The development of this project was in fullfillment of the requirements outlined by 41030 Engineering Capstone at the University of Technology Sydney.
 
