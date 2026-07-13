@@ -10,7 +10,7 @@ The required dependencies may also be installed manually. Look into `flake.nix` 
 
 ### Building
 
-`cd` into the `datastream/` directory and run the following commands.
+Run the following commands
 
 ```bash
 mkdir build
@@ -19,7 +19,7 @@ cmake ..
 make
 ```
 
-After running these commands (and assuming all the required dependencies are installed), an `unicorn_datastream` executable should be compiled. To check that everything is working correctly, try running `./unicorn-datastream --help`.
+After running these commands (and assuming all the required dependencies are installed), a `unicorn_datastream` executable should be compiled. To check that everything is working correctly, try running `./unicorn-datastream --help`.
 
 ## Running
 
