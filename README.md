@@ -26,3 +26,16 @@ The above diagram shows the general software architecture of project, and genera
 - The data processing section corresponds to the `processing/` subdirectory.
 - The VR scenario corresponds to the `unity-project/` subdirectory.
 
+## Running everything together
+
+1. (If using Phone VR) Install ![PhoneVR](https://github.com/PhoneVR-Developers/PhoneVR), ![ALVR](https://github.com/alvr-org/ALVR) and SteamVR.
+2. Start SteamVR, ALVR and PhoneVR and ensure that the default SteamVR scene is visible within the headset. If this doesn't work or the connection is bad, adjust settings within ALVR until it is working.
+3. Start Unity and open the unity project (contained within `unity-project`). Ensure that the selected scene is "SampleScene" and the "XRDeviceSimulator" is disabled.
+4. Start the software contained in `exg-lsl/`, `processing/` and `experiment/` in seperate shells. This should:
+   - Open an interface to connect to the EEG headset using Bluetooth.
+   - Open an interface that can configure the neurofeedback protocols.
+   - Open a CLI script that should be waiting for enter to be pressed.
+5. Turn on the EEG device (if using the `NCBI exg`, this is done by long pressing the button on the side).
+6. Connect to it using the interface opened earlier.
+7. At this point, you should see data streaming into the interface that controls the neurofeedback protocols. You can customize the protocols now.
+8. Put the headset on and press play in the Unity scenario. At this point you should see the VR beach environment within the headset, however the feedbacks will not be adjusting at this point. Wait until the EEG waveform is relatively stable, then press enter on the CLI script that was waiting. This should begin the experiment, and take you through measuring a baseline and the neurofeedback training blocks.
